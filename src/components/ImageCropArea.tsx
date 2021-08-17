@@ -186,7 +186,7 @@ const ImageCropArea = () => {
                 marginBottom: "20px",
               }}
             >
-              <ScaleFade in={isOpen} >
+              <ScaleFade in={isOpen}>
                 <IconButton
                   colorScheme="red"
                   aria-label="DeleteImageButton"
