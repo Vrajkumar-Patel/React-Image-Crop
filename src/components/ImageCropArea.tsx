@@ -9,7 +9,7 @@ import {
   useDisclosure,
   Image,
   IconButton,
-  Divider
+  Divider,
 } from "@chakra-ui/react";
 import ReactCrop from "react-image-crop";
 import { MdDelete } from "react-icons/md";
@@ -25,10 +25,7 @@ const ImageCropArea = () => {
   const [upImg, setUpImg] = useState<string>();
   const [completedCrop, setCompletedCrop] = useState<ReactCrop.Crop | null>(null);
   const [imgLoading, setImgLoading] = useState<boolean>(false);
-  // const [showIcons, setShowIcons] = useState<boolean>(false);
   const { isOpen, onToggle } = useDisclosure();
-  // const [draggingOver, setDraggingOver] = useState<boolean>(false);
-  // const [draggingEnd, setDraggingEnd] = useState<boolean>(false);
   const [editImage, setEditImage] = useState<boolean>(false);
 
   console.log(editImage);
@@ -111,17 +108,6 @@ const ImageCropArea = () => {
     }
   }, [completedCrop]);
 
-  //   const removeCircle = () => {
-  //     const arrowCircle = document.getElementById("arrowDragCircle");
-  //     arrowCircle!.style.width = "500px";
-  //     arrowCircle!.style.height = "500px";
-  //     arrowCircle!.style.opacity = "0";
-  //     arrowCircle!.style.marginLeft = "-250px";
-  //     arrowCircle!.style.marginTop = "-250px";
-  //     arrowCircle!.style.display = "none";
-  //     arrowCircle!.style.transition = "300ms ease";
-  //   };
-
   return (
     <div className="imageCropArea" onMouseMove={(e) => getArrowData(e)}>
       <Heading
@@ -140,7 +126,6 @@ const ImageCropArea = () => {
         align="center"
         bgColor="gray.200"
         overflow="hidden"
-        // maxHeight="60%"
         maxWidth="60%"
         minHeight="30%"
         minWidth="30%"
@@ -153,42 +138,6 @@ const ImageCropArea = () => {
         zIndex={1}
         margin="0 auto"
       >
-        {/* <div
-              style={{
-                position: "absolute",
-                top: `calc(${arrowY}px)`,
-                left: `calc(${arrowX}px - 25vw)`,
-                minWidth: "400px",
-                minHeight: "400px",
-                // background: "red",
-                border: "100px solid gray",
-                borderRadius: "50%",
-                zIndex: 100,
-              }}
-            ></div> */}
-        {/* {draggingOver ? (
-          <Box
-            id="arrowDragCircle"
-            marginTop={-10}
-            marginLeft={-10}
-            cursor="initial"
-            width={20}
-            height={20}
-            borderRadius="50%"
-            backgroundColor="gray.300"
-            opacity="0.6"
-            zIndex={2}
-            onClick={removeCircle}
-            style={{
-              position: "absolute",
-              top: `calc(${arrowY}px)`,
-              left: `calc(${arrowX}px - 25vw)`,
-            }}
-          ></Box>
-        ) : (
-          <></>
-        )} */}
-
         {upImg ? (
           <div
             style={{
@@ -281,15 +230,23 @@ const ImageCropArea = () => {
             {imgLoading ? (
               <Spinner zIndex="100" position="absolute" top="0" right="0" margin={3} />
             ) : null}
-            <Heading pos="absolute" top="40%" color="gray.400" cursor="initial">
+            <Heading
+              pos="absolute"
+              top="40%"
+              color="gray.400"
+              cursor="default"
+              onClick={() => {
+                document.getElementById("droppableArea")?.click();
+              }}
+            >
               Drop Your Image Here
             </Heading>
           </>
         )}
       </Flex>
       {completedCrop?.width || completedCrop?.height ? (
-        <div style={{marginTop: '10px'}}>
-          <Divider height={2} background='blackAlpha.400' />
+        <div style={{ marginTop: "10px" }}>
+          <Divider height={2} background="blackAlpha.400" />
           <Heading textAlign="center" marginBottom={2}>
             Preview
           </Heading>
