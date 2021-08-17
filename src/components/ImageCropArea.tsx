@@ -2,15 +2,19 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   Flex,
   Input,
+  Button,
   Text,
   Heading,
   Spinner,
+  Fade,
   ScaleFade,
   useDisclosure,
   Box,
-  calc,
+  Divider,
+  IconButton,
 } from "@chakra-ui/react";
 import ReactCrop from "react-image-crop";
+import { MdDelete } from "react-icons/md";
 
 const ImageCropArea = () => {
   const imgRef = useRef();
@@ -23,9 +27,10 @@ const ImageCropArea = () => {
   const [imgLoading, setImgLoading] = useState<boolean>(false);
   const [showIcons, setShowIcons] = useState<boolean>(false);
   const { isOpen, onToggle } = useDisclosure();
+  const [draggingOver, setDraggingOver] = useState<boolean>(false);
+  const [draggingEnd, setDraggingEnd] = useState<boolean>(false);
 
   const getArrowData = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    //   console.log(e);
     setArrowX(e.pageX);
     setArrowY(e.pageY);
   };
@@ -37,9 +42,9 @@ const ImageCropArea = () => {
         const reader = new FileReader();
         reader.addEventListener("load", () => setUpImg(reader.result as string));
         reader.readAsDataURL(e.target.files[0]);
+        setImgLoading(false);
         onToggle();
       }
-      setImgLoading(false);
     }, 2000);
   };
 
@@ -47,65 +52,167 @@ const ImageCropArea = () => {
     imgRef.current = img;
   }, []);
 
-  const removeCircle = () => {
-    const arrowCircle = document.getElementById("arrowDragCircle");
-    arrowCircle!.style.width = "500px";
-    arrowCircle!.style.height = "500px";
-    arrowCircle!.style.opacity = "0";
-    arrowCircle!.style.marginLeft = "-250px";
-    arrowCircle!.style.marginTop = "-250px";
-    //   arrowCircle!.style.display = 'none';
-    arrowCircle!.style.transition = "300ms ease";
+  const downloadImage = (canvas: any, crop: ReactCrop.Crop) => {
+    if (!crop || !canvas) {
+      return;
+    }
+
+    canvas.toBlob(
+      (blob: any) => {
+        const previewUrl = window.URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.download = "Preview Image";
+        anchor.href = previewUrl;
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+        window.URL.revokeObjectURL(previewUrl);
+      },
+      "image/png",
+      1
+    );
   };
 
+  useEffect(() => {
+    if (!completedCrop || !previewCanvasRef.current || !imgRef.current) {
+      return;
+    }
+
+    const image: any = imgRef.current;
+    const canvas: any = previewCanvasRef.current;
+    const crop = completedCrop;
+
+    if (image && canvas && crop) {
+      const scaleX = image.naturalWidth / image.width;
+      const scaleY = image.naturalHeight / image.height;
+      const ctx = canvas.getContext("2d");
+      const pixelRatio = window.devicePixelRatio;
+
+      canvas.width = crop.width! * pixelRatio * scaleX;
+      canvas.height = crop.height! * pixelRatio * scaleY;
+
+      ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      ctx.imageSmoothingQuality = "high";
+
+      ctx.drawImage(
+        image,
+        crop.x! * scaleX,
+        crop.y! * scaleY,
+        crop.width! * scaleX,
+        crop.height! * scaleY,
+        0,
+        0,
+        crop.width! * scaleX,
+        crop.height! * scaleY
+      );
+    }
+  }, [completedCrop]);
+
+  //   const removeCircle = () => {
+  //     const arrowCircle = document.getElementById("arrowDragCircle");
+  //     arrowCircle!.style.width = "500px";
+  //     arrowCircle!.style.height = "500px";
+  //     arrowCircle!.style.opacity = "0";
+  //     arrowCircle!.style.marginLeft = "-250px";
+  //     arrowCircle!.style.marginTop = "-250px";
+  //     arrowCircle!.style.display = "none";
+  //     arrowCircle!.style.transition = "300ms ease";
+  //   };
+
   return (
-    <Flex
-      flexDirection="column"
-      h="100vh"
-      w="100vw"
-      justify="center"
-      align="center"
-      onMouseMove={(e) => getArrowData(e)}
-    >
+    <div className="imageCropArea" onMouseMove={(e) => getArrowData(e)}>
       <Flex
         flexDir="column"
         justify="center"
         align="center"
         bgColor="gray.200"
         overflow="hidden"
-        maxHeight="70%"
-        maxWidth="70%"
-        minHeight="50%"
-        minWidth="50%"
+        // maxHeight="60%"
+        maxWidth="60%"
         h={upImg ? "fit-content" : "50%"}
         w={upImg ? "fit-content" : "50%"}
         borderRadius={7}
         pos="relative"
-        cursor="pointer"
+        cursor="none"
         border={upImg ? "2px solid black" : ""}
         padding={upImg ? 1 : 0}
         zIndex={1}
+        margin="0 auto"
       >
-        {/* <Box
-          id="arrowDragCircle"
-          marginTop={-10}
-          marginLeft={-10}
-          cursor="initial"
-          width={20}
-          height={20}
-          borderRadius="50%"
-          backgroundColor="gray.300"
-          opacity="0.6"
-          zIndex={2}
-          onClick={removeCircle}
-          style={{
-            position: "absolute",
-            top: `calc(${arrowY}px - 25vh)`,
-            left: `calc(${arrowX}px - 25vw)`,
-          }}
-        ></Box> */}
+        {/* <div
+              style={{
+                position: "absolute",
+                top: `calc(${arrowY}px)`,
+                left: `calc(${arrowX}px - 25vw)`,
+                minWidth: "400px",
+                minHeight: "400px",
+                // background: "red",
+                border: "100px solid gray",
+                borderRadius: "50%",
+                zIndex: 100,
+              }}
+            ></div> */}
+        {/* {draggingOver ? (
+          <Box
+            id="arrowDragCircle"
+            marginTop={-10}
+            marginLeft={-10}
+            cursor="initial"
+            width={20}
+            height={20}
+            borderRadius="50%"
+            backgroundColor="gray.300"
+            opacity="0.6"
+            zIndex={2}
+            onClick={removeCircle}
+            style={{
+              position: "absolute",
+              top: `calc(${arrowY}px)`,
+              left: `calc(${arrowX}px - 25vw)`,
+            }}
+          ></Box>
+        ) : (
+          <></>
+        )} */}
+
         {upImg ? (
-          <ScaleFade initialScale={0.1} in={isOpen}>
+          <>
+            <div
+              style={{
+                textAlign: "center",
+                position: "absolute",
+                bottom: 0,
+                zIndex: 2,
+                marginBottom: "20px",
+              }}
+            >
+              <ScaleFade in={isOpen}>
+                <IconButton
+                  colorScheme="red"
+                  aria-label="DeleteImageButton"
+                  borderRadius="50%"
+                  //   padding='10px'
+                  onClick={() => {
+                    setUpImg("");
+                    setCrop(undefined);
+                    setCompletedCrop(null);
+                    imgRef.current = undefined;
+                    previewCanvasRef.current = null;
+                    onToggle();
+                  }}
+                >
+                  <MdDelete style={{ fontSize: "30px" }} />
+                </IconButton>
+              </ScaleFade>
+            </div>
+            <br />
+          </>
+        ) : (
+          <></>
+        )}
+
+        {upImg ? (
+          <Fade in={isOpen} style={{ transition: "all 0.2s" }}>
             <ReactCrop
               src={upImg}
               onChange={(newCrop) => setCrop(newCrop)}
@@ -114,10 +221,11 @@ const ImageCropArea = () => {
               onComplete={(cropped) => setCompletedCrop(cropped)}
               onImageError={(e) => alert(e)}
             />
-          </ScaleFade>
+          </Fade>
         ) : (
           <>
             <Input
+              id="droppableArea"
               className="inputTypeFile"
               type="file"
               accept="image/*"
@@ -127,6 +235,16 @@ const ImageCropArea = () => {
               d="flex"
               justify="center"
               align="center"
+              cursor={draggingOver ? "cell" : "pointer"}
+              onDragOver={(e) => {
+                console.log(e);
+                setDraggingOver(true);
+                document.getElementById("droppableArea")!.style.cursor = "pointer";
+              }}
+              onDrop={() => {
+                setDraggingOver(false);
+                setDraggingOver(true);
+              }}
             />
             {imgLoading ? (
               <Spinner zIndex="100" position="absolute" top="0" right="0" margin={3} />
@@ -139,16 +257,35 @@ const ImageCropArea = () => {
           </>
         )}
       </Flex>
-      <div>
-        <canvas
-          ref={previewCanvasRef}
-          style={{
-            width: Math.round(completedCrop?.width ?? 0),
-            height: Math.round(completedCrop?.height ?? 0),
-          }}
-        />
-      </div>
-    </Flex>
+      {completedCrop?.width || completedCrop?.height ? (
+        <div>
+          <Heading textAlign="center">Preview</Heading>
+          <br />
+          <canvas
+            ref={previewCanvasRef}
+            style={{
+              width: Math.round(completedCrop?.width ?? 0),
+              height: Math.round(completedCrop?.height ?? 0),
+              margin: "0 auto",
+              border: "1px solid black",
+            }}
+          />
+        </div>
+      ) : null}
+
+      {completedCrop?.width || completedCrop?.height ? (
+        <div style={{ textAlign: "center" }}>
+          <br />
+          <Button
+            colorScheme="blue"
+            disabled={!completedCrop?.width || !completedCrop?.height}
+            onClick={() => downloadImage(previewCanvasRef.current, completedCrop)}
+          >
+            Download Cropped Image
+          </Button>
+        </div>
+      ) : null}
+    </div>
   );
 };
 
