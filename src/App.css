@@ -2,6 +2,7 @@
   height: 100vh;
   width: 100vw;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
@@ -11,4 +12,13 @@
 }
 .inputTypeFile::-webkit-file-upload-button{
   display: none; 
+}
+.imageCropArea{
+  height: 100%;
+  width: 100%;
+}
+.chakra-offset-slide{
+  opacity: 1 !important;
+  transform: scale(1) !important ;
+  transition: 300ms;
 }
