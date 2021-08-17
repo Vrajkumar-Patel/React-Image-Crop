@@ -53,9 +53,9 @@ const ImageCropArea = () => {
     arrowCircle!.style.height = "500px";
     arrowCircle!.style.opacity = "0";
     arrowCircle!.style.marginLeft = "-250px";
-      arrowCircle!.style.marginTop = "-250px";
+    arrowCircle!.style.marginTop = "-250px";
     //   arrowCircle!.style.display = 'none';
-      arrowCircle!.style.transition = '300ms ease'
+    arrowCircle!.style.transition = "300ms ease";
   };
 
   return (
