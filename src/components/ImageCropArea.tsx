@@ -135,7 +135,7 @@ const ImageCropArea = () => {
         pos="relative"
         cursor="none"
         border={upImg ? "2px solid black" : ""}
-        padding={upImg ? 1 : 0}
+        padding={0}
         zIndex={1}
         margin="0 auto"
       >
@@ -176,40 +176,35 @@ const ImageCropArea = () => {
         )} */}
 
         {upImg ? (
-          <>
-            <div
-              style={{
-                textAlign: "center",
-                position: "absolute",
-                bottom: 0,
-                zIndex: 2,
-                marginBottom: "20px",
-              }}
-            >
-              <ScaleFade in={isOpen}>
-                <IconButton
-                  colorScheme="red"
-                  aria-label="DeleteImageButton"
-                  borderRadius="50%"
-                  //   padding='10px'
-                  onClick={() => {
-                    setUpImg("");
-                    setCrop(undefined);
-                    setCompletedCrop(null);
-                    imgRef.current = undefined;
-                    previewCanvasRef.current = null;
-                    onToggle();
-                  }}
-                >
-                  <MdDelete style={{ fontSize: "30px" }} />
-                </IconButton>
-              </ScaleFade>
-            </div>
-            <br />
-          </>
-        ) : (
-          <></>
-        )}
+          <div
+            style={{
+              textAlign: "center",
+              position: "absolute",
+              bottom: 0,
+              zIndex: 2,
+              marginBottom: "20px",
+            }}
+          >
+            <Fade in={isOpen} style={{ transition: "300ms", transitionDelay: "500ms" }}>
+              <IconButton
+                colorScheme="red"
+                aria-label="DeleteImageButton"
+                borderRadius="50%"
+                //   padding='10px'
+                onClick={() => {
+                  setUpImg("");
+                  setCrop(undefined);
+                  setCompletedCrop(null);
+                  imgRef.current = undefined;
+                  previewCanvasRef.current = null;
+                  onToggle();
+                }}
+              >
+                <MdDelete style={{ fontSize: "30px" }} />
+              </IconButton>
+            </Fade>
+          </div>
+        ) : null}
 
         {upImg ? (
           <Fade in={isOpen} style={{ transition: "all 0.2s" }}>
@@ -248,9 +243,7 @@ const ImageCropArea = () => {
             />
             {imgLoading ? (
               <Spinner zIndex="100" position="absolute" top="0" right="0" margin={3} />
-            ) : (
-              <></>
-            )}
+            ) : null}
             <Heading pos="absolute" top="40%" color="gray.400">
               Drop Your Image Here
             </Heading>
