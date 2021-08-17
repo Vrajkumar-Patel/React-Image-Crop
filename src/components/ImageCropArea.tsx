@@ -3,18 +3,18 @@ import {
   Flex,
   Input,
   Button,
-  Text,
   Heading,
   Spinner,
   Fade,
-  ScaleFade,
   useDisclosure,
-  Box,
-  Divider,
+  Image,
   IconButton,
+  Divider
 } from "@chakra-ui/react";
 import ReactCrop from "react-image-crop";
 import { MdDelete } from "react-icons/md";
+import { RiPencilFill } from "react-icons/ri";
+import { BiArrowBack } from "react-icons/bi";
 
 const ImageCropArea = () => {
   const imgRef = useRef();
@@ -25,10 +25,13 @@ const ImageCropArea = () => {
   const [upImg, setUpImg] = useState<string>();
   const [completedCrop, setCompletedCrop] = useState<ReactCrop.Crop | null>(null);
   const [imgLoading, setImgLoading] = useState<boolean>(false);
-  const [showIcons, setShowIcons] = useState<boolean>(false);
+  // const [showIcons, setShowIcons] = useState<boolean>(false);
   const { isOpen, onToggle } = useDisclosure();
-  const [draggingOver, setDraggingOver] = useState<boolean>(false);
-  const [draggingEnd, setDraggingEnd] = useState<boolean>(false);
+  // const [draggingOver, setDraggingOver] = useState<boolean>(false);
+  // const [draggingEnd, setDraggingEnd] = useState<boolean>(false);
+  const [editImage, setEditImage] = useState<boolean>(false);
+
+  console.log(editImage);
 
   const getArrowData = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     setArrowX(e.pageX);
@@ -121,6 +124,16 @@ const ImageCropArea = () => {
 
   return (
     <div className="imageCropArea" onMouseMove={(e) => getArrowData(e)}>
+      <Heading
+        marginBottom={2}
+        textColor="gray.600"
+        background="linear-gradient(90deg, rgba(234,111,155,1) 0%, rgba(246,198,134,1) 33%, rgba(121,205,195,1) 71%, rgba(0,212,255,1) 100%)"
+        textAlign="center"
+        padding={3}
+        margin="10 auto"
+      >
+        Image Cropper
+      </Heading>
       <Flex
         flexDir="column"
         justify="center"
@@ -129,11 +142,12 @@ const ImageCropArea = () => {
         overflow="hidden"
         // maxHeight="60%"
         maxWidth="60%"
+        minHeight="30%"
+        minWidth="30%"
         h={upImg ? "fit-content" : "50%"}
         w={upImg ? "fit-content" : "50%"}
         borderRadius={7}
         pos="relative"
-        cursor="none"
         border={upImg ? "2px solid black" : ""}
         padding={0}
         zIndex={1}
@@ -190,7 +204,8 @@ const ImageCropArea = () => {
                 colorScheme="red"
                 aria-label="DeleteImageButton"
                 borderRadius="50%"
-                //   padding='10px'
+                size="lg"
+                marginRight={3}
                 onClick={() => {
                   setUpImg("");
                   setCrop(undefined);
@@ -202,21 +217,53 @@ const ImageCropArea = () => {
               >
                 <MdDelete style={{ fontSize: "30px" }} />
               </IconButton>
+              {!editImage ? (
+                <IconButton
+                  colorScheme="green"
+                  aria-label="EditImageCropButton"
+                  borderRadius="50%"
+                  size="lg"
+                  onClick={() => {
+                    setEditImage(!editImage);
+                  }}
+                >
+                  <RiPencilFill style={{ fontSize: "30px" }} />
+                </IconButton>
+              ) : (
+                <IconButton
+                  colorScheme="green"
+                  aria-label="EditImageCropButton"
+                  borderRadius="50%"
+                  size="lg"
+                  onClick={() => {
+                    setEditImage(!editImage);
+                  }}
+                >
+                  <BiArrowBack style={{ fontSize: "30px" }} />
+                </IconButton>
+              )}
             </Fade>
           </div>
         ) : null}
 
         {upImg ? (
-          <Fade in={isOpen} style={{ transition: "all 0.2s" }}>
-            <ReactCrop
-              src={upImg}
-              onChange={(newCrop) => setCrop(newCrop)}
-              crop={crop}
-              onImageLoaded={onLoad}
-              onComplete={(cropped) => setCompletedCrop(cropped)}
-              onImageError={(e) => alert(e)}
-            />
-          </Fade>
+          editImage ? (
+            <Fade in={isOpen} style={{ height: "fit-content", transition: "200ms" }}>
+              <ReactCrop
+                src={upImg}
+                onChange={(newCrop) => setCrop(newCrop)}
+                crop={crop}
+                onImageLoaded={onLoad}
+                onComplete={(cropped) => setCompletedCrop(cropped)}
+                onImageError={(e) => alert(e)}
+                ruleOfThirds={true}
+              />
+            </Fade>
+          ) : (
+            <Fade in={isOpen} style={{ transition: "200ms" }}>
+              <Image src={upImg} cursor="initial" />
+            </Fade>
+          )
         ) : (
           <>
             <Input
@@ -230,30 +277,22 @@ const ImageCropArea = () => {
               d="flex"
               justify="center"
               align="center"
-              cursor={draggingOver ? "cell" : "pointer"}
-              onDragOver={(e) => {
-                console.log(e);
-                setDraggingOver(true);
-                document.getElementById("droppableArea")!.style.cursor = "pointer";
-              }}
-              onDrop={() => {
-                setDraggingOver(false);
-                setDraggingOver(true);
-              }}
             />
             {imgLoading ? (
               <Spinner zIndex="100" position="absolute" top="0" right="0" margin={3} />
             ) : null}
-            <Heading pos="absolute" top="40%" color="gray.400">
+            <Heading pos="absolute" top="40%" color="gray.400" cursor="initial">
               Drop Your Image Here
             </Heading>
           </>
         )}
       </Flex>
       {completedCrop?.width || completedCrop?.height ? (
-        <div>
-          <Heading textAlign="center">Preview</Heading>
-          <br />
+        <div style={{marginTop: '10px'}}>
+          <Divider height={2} background='blackAlpha.400' />
+          <Heading textAlign="center" marginBottom={2}>
+            Preview
+          </Heading>
           <canvas
             ref={previewCanvasRef}
             style={{
@@ -267,8 +306,7 @@ const ImageCropArea = () => {
       ) : null}
 
       {completedCrop?.width || completedCrop?.height ? (
-        <div style={{ textAlign: "center" }}>
-          <br />
+        <div style={{ textAlign: "center", marginTop: "10px" }}>
           <Button
             colorScheme="blue"
             disabled={!completedCrop?.width || !completedCrop?.height}
