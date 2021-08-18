@@ -323,6 +323,7 @@ const ImageCropArea = () => {
         >
           <Button
             colorScheme="blue"
+            marginBottom={2}
             disabled={!completedCrop?.width || !completedCrop?.height}
             onClick={() => downloadImage(previewCanvasRef.current, completedCrop)}
           >
