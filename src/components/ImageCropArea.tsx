@@ -111,16 +111,18 @@ const ImageCropArea = () => {
   return (
     <div className="imageCropArea" onMouseMove={(e) => getArrowData(e)}>
       <Heading
+        className="imageCropArea__heading"
         marginBottom={2}
         textColor="gray.600"
         background="linear-gradient(90deg, rgba(234,111,155,1) 0%, rgba(246,198,134,1) 33%, rgba(121,205,195,1) 71%, rgba(0,212,255,1) 100%)"
         textAlign="center"
-        padding={3}
-        margin="10 auto"
+        paddingBottom='10px'
+        // margin="10 auto"
       >
         Image Cropper
       </Heading>
       <Flex
+        className="imageCropArea__imageContainer"
         flexDir="column"
         justify="center"
         align="center"
@@ -137,9 +139,22 @@ const ImageCropArea = () => {
         padding={0}
         zIndex={1}
         margin="0 auto"
+        sx={{
+          "@media (max-width: 1100px)": {
+            height: upImg ? "fit-content" : "70%",
+            width: upImg ? "fit-content" : "70%",
+            maxWidth: "80%",
+          },
+          "@media (max-width: 700px)": {
+            height: upImg ? "fit-content" : "50%",
+            width: upImg ? "fit-content" : "96%",
+            maxWidth: "100%",
+          },
+        }}
       >
         {upImg ? (
           <div
+            className="imageCropArea__iconButton"
             style={{
               textAlign: "center",
               position: "absolute",
@@ -163,8 +178,21 @@ const ImageCropArea = () => {
                   previewCanvasRef.current = null;
                   onToggle();
                 }}
+                sx={{
+                  "@media (max-width: 1100px)": {
+                    minWidth: '40px ',
+                    height: '40px '
+                  },
+                  "@media (max-width: 700px)": {
+                    minWidth: '30px',
+                    height: '30px'
+                  },
+                }}
               >
-                <MdDelete style={{ fontSize: "30px" }} />
+                <MdDelete
+                  style={{ fontSize: "30px" }}
+                  className='imageCropArea__deleteImage'
+                />
               </IconButton>
               {!editImage ? (
                 <IconButton
@@ -175,8 +203,18 @@ const ImageCropArea = () => {
                   onClick={() => {
                     setEditImage(!editImage);
                   }}
+                  sx={{
+                    "@media (max-width: 1100px)": {
+                      minWidth: '40px ',
+                      height: '40px '
+                    },
+                    "@media (max-width: 700px)": {
+                      minWidth: '30px',
+                      height: '30px'
+                    },
+                  }}
                 >
-                  <RiPencilFill style={{ fontSize: "30px" }} />
+                  <RiPencilFill className='imageCropArea__pencilImage' style={{ fontSize: "30px" }} />
                 </IconButton>
               ) : (
                 <IconButton
@@ -187,8 +225,18 @@ const ImageCropArea = () => {
                   onClick={() => {
                     setEditImage(!editImage);
                   }}
+                  sx={{
+                    "@media (max-width: 1100px)": {
+                      minWidth: '40px ',
+                      height: '40px '
+                    },
+                    "@media (max-width: 700px)": {
+                      minWidth: '30px',
+                      height: '30px'
+                    },
+                  }}
                 >
-                  <BiArrowBack style={{ fontSize: "30px" }} />
+                  <BiArrowBack className='imageCropArea__backArrowImage' style={{ fontSize: "30px" }} />
                 </IconButton>
               )}
             </Fade>
@@ -237,7 +285,12 @@ const ImageCropArea = () => {
               cursor="default"
               onClick={() => {
                 document.getElementById("droppableArea")?.click();
-              }}
+                }}
+                sx={{
+                  "@media (max-width: 390px)": {
+                     fontSize: '20px' 
+                  }
+                }}
             >
               Drop Your Image Here
             </Heading>
@@ -245,16 +298,17 @@ const ImageCropArea = () => {
         )}
       </Flex>
       {completedCrop?.width || completedCrop?.height ? (
-        <div style={{ marginTop: "10px" }}>
-          <Divider height={2} background="blackAlpha.400" />
+        <div style={{ marginTop: "10px", width: '100%' }} className="imageCropArea__preview">
+          <Divider height={2} background="linear-gradient(90deg, rgba(234,111,155,1) 0%, rgba(246,198,134,1) 33%, rgba(121,205,195,1) 71%, rgba(0,212,255,1) 100%)" />
           <Heading textAlign="center" marginBottom={2}>
             Preview
           </Heading>
           <canvas
             ref={previewCanvasRef}
+            className='imageCropArea__canvas'
             style={{
-              width: Math.round(completedCrop?.width ?? 0),
-              height: Math.round(completedCrop?.height ?? 0),
+              width: '50%',
+              height: '100%',
               margin: "0 auto",
               border: "1px solid black",
             }}
@@ -263,7 +317,10 @@ const ImageCropArea = () => {
       ) : null}
 
       {completedCrop?.width || completedCrop?.height ? (
-        <div style={{ textAlign: "center", marginTop: "10px" }}>
+        <div
+          style={{ textAlign: "center", marginTop: "10px" }}
+          className="imageCropArea__downloadButton"
+        >
           <Button
             colorScheme="blue"
             disabled={!completedCrop?.width || !completedCrop?.height}

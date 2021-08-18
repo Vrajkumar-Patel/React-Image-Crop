@@ -23,3 +23,31 @@
   transform: scale(1) !important ;
   transition: 300ms;
 }
+@media (max-width: 1100px){
+  .imageCropArea__deleteImage{
+    font-size: 25px !important;
+  }
+  .imageCropArea__pencilImage{
+    font-size: 25px !important;
+  }
+  .imageCropArea__backArrowImage{
+    font-size: 25px !important;
+  }
+  .imageCropArea__canvas{
+    width: 80% !important;
+  }
+}
+@media (max-width: 700px){
+  .imageCropArea__deleteImage{
+    font-size: 20px !important;
+  }
+  .imageCropArea__pencilImage{
+    font-size: 20px !important;
+  }
+  .imageCropArea__backArrowImage{
+    font-size: 20px !important;
+  }
+  .imageCropArea__canvas{
+    width: 96% !important;
+  }
+}
